@@ -1,0 +1,5 @@
+set nowrap
+
+## Stam files
+include "/home/stamuser/stam/nanorc/stam.nanorc"
+

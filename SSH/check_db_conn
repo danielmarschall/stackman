@@ -1,0 +1,17 @@
+#!/usr/bin/php
+<?php
+
+if (($argc > 2) || (isset($argv[1]) && ($argv[1] != '-q'))) {
+	echo "Syntax: $argv[0] [-q]\n";
+	exit(2);
+}
+
+require_once __DIR__ . '/includes/db.inc.php';
+
+if ((!isset($argv[1])) || ($argv[1] != '-q')) {
+	echo "MySQL connection OK!\n";
+}
+
+# TODO: check if tables are set up correctly
+
+exit(0);

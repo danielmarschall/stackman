@@ -1,0 +1,44 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/src.inc.php';
+
+if ($argc <> 3) {
+	echo "Syntax: $argv[0] <cat> <entry>\n";
+	exit(2);
+}
+
+$cat = trim($argv[1]);
+$ent = rtrim($argv[2]);
+
+if ($stam_cfg['simulation']) {
+	fwrite(STDERR, "============ APS SIMULATION: $cat :: $ent\n");
+	die();
+}
+
+$x = db_query("INSERT INTO stam_entries (cat, txt, src) VALUES (
+	'".db_real_escape_string($cat)."',
+	'".db_real_escape_string($ent)."',
+	'".db_real_escape_string($src)."'
+	)");
+if (!$x) {
+	fwrite(STDERR, db_error()."\n");
+	db_close();
+	exit(1);
+}
+
+$id = db_insert_id();
+if (!$id) {
+	fwrite(STDERR, "Error: Could not insert\n");
+	db_close();
+	exit(1);
+}
+#echo green("OK! Created ID $id\n<$cat> $ent\n");
+echo green("OK! $id * <$cat> $ent\n");
+
+# ---
+
+function green($txt) {
+	return "\033[1;32;40m".$txt."\033[0m";
+}

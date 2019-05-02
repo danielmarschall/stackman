@@ -1,0 +1,4 @@
+#!/bin/bash
+username=$( whoami )
+hostname=$( uname -n )
+echo "$username@$hostname"

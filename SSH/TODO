@@ -1,0 +1,7 @@
+db-config in INI auslagern
+export_file alternative: ausgabe als *.stam format (problem: timestamps gehen velroren)
+import_file aus stam-format ODER raw-text-format ODER format mit timestamps
+united systemwide journal (-> mysql), nicht userjournal (~.stam_journal) -- anzeigbar in stam direkt
+"-le" dauert ewig, direkt ans ende springen
+komplett anonymer eingabemodus
+

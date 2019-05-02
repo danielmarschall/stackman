@@ -1,0 +1,26 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+
+array_shift($argv);
+if (!isset($argv[0]) || (trim($argv[0])=='')) {
+	echo "Syntax: $0 <category>\n";
+	echo "Category may not be a wildcard\n";
+	exit(2);
+}
+
+$arg = trim(implode(' ', $argv));
+$res = db_query("SELECT DISTINCT cat FROM stam_entries
+	WHERE cat = '".db_real_escape_string($arg)."'
+	AND state != 'S'
+	ORDER BY ts ASC, cat ASC");
+if (!$res) {
+	fwrite(STDERR, db_error()."\n");
+	db_close();
+	exit(1);
+}
+while ($row = db_fetch_array($res)) {
+	exit(0);
+}
+exit(1);

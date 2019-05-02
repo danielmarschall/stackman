@@ -1,0 +1,60 @@
+syntax "stam" "\.stam(_history){0,1}$"
+header "^#!.*/stam$"
+
+## Category change
+color yellow "^#[^#]*$"
+
+## Shebang
+color green "^#!.*/stam$"
+
+## Mark invalid parameters
+color ,red "^-(back|b).+"
+color ,red "^-(clear|cls).+"
+color ,red "^-(batch|bat).+"
+color ,red "^-(sub|su).+"
+color ,red "^-(showhistory|shi).+"
+color ,red "^-(listcurent|lce).+"
+color ,red "^-(help|h|\?).+"
+color ,red "^-(exit|quit|x|q).+"
+color ,red "^-(unstrike|unstr).+"
+color ,red "^-(strike|str).+"
+color ,red "^-(movefromid|mfi).+"
+
+## Known command parameters
+color yellow "^-(singleadd|sa|as|appendsingle|aps)[[:space:]]+[^[:space:]]+"
+color yellow "^-(movefromcat|mfc)[[:space:]]+[^[:space:]]+"
+color yellow "^-(listent|le)[[:space:]]+.+"
+color yellow "^-(listcat|ls|lc)[[:space:]]+.+"
+color magenta "^-(unstrike|unstr)[[:space:]]+([[:digit:]]+(\-[[:digit:]]+){0,1}|last)"
+color magenta "^-(strike|str)[[:space:]]+([[:digit:]]+(\-[[:digit:]]+){0,1}|last)"
+color magenta "^-(movefromid|mfi)[[:space:]]+([[:digit:]]+(\-[[:digit:]]+){0,1}|last)"
+
+## Unknown commands
+color ,red "^-[^-][^[:space:]]*"
+
+## Known commands
+color red "^-(back|b)([[:space:]]|$)"
+color red "^-(strike|str)([[:space:]]|$)"
+color red "^-(singleadd|sa|as|appendsingle|aps)([[:space:]]|$)"
+color red "^-(unstrike|unstr)([[:space:]]|$)"
+color red "^-(movefromid|mfi)([[:space:]]|$)"
+color red "^-(movefromcat|mfc)([[:space:]]|$)"
+color red "^-(listent|le)([[:space:]]|$)"
+color red "^-(listcurent|lce)([[:space:]]|$)"
+color red "^-(listcat|ls|lc)([[:space:]]|$)"
+color red "^-(clear|cls)([[:space:]]|$)"
+color red "^-(batch|bat)([[:space:]]|$)"
+color red "^-(sub|su)([[:space:]]|$)"
+color red "^-(showhistory|shi)([[:space:]]|$)"
+color red "^-(help|h|\?)([[:space:]]|$)"
+color black,green "^-(exit|quit|x|q)([[:space:]]|$)"
+
+## Missing parameters
+color black,yellow "^-(strike|str)[[:space:]]*$"
+color black,yellow "^-(unstrike|unstr)[[:space:]]*$"
+color black,yellow "^-(movefromid|mfi)[[:space:]]*$"
+color black,yellow "^-(movefromcat|mfc)[[:space:]]*$"
+color black,yellow "^-(singleadd|sa|as|appendsingle|aps)([[:space:]][^[:space:]]+){0,1}[[:space:]]*$"
+
+## Trailing whitespace
+color ,yellow "[[:space:]]+$"

@@ -1,0 +1,89 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/src.inc.php';
+
+if ($argc <> 3) {
+	echo "Syntax: $argv[0] <newCategory> <id>\n";
+	#db_close();
+	exit(2);
+}
+
+$newcat = trim($argv[1]);
+$id     = trim($argv[2]);
+
+# Range support
+if (strpos($id, '-') !== false) {
+	$ary = explode('-', $id, 2);
+	$id_min = $ary[0];
+	$id_max = $ary[1];
+} else {
+	$id_min = $id;
+	$id_max = $id;
+}
+if (($id_min == 0) || ($id_max == 0)) {
+	fwrite(STDERR, "0 not a valid ID\n");
+	#db_close();
+	exit(3);
+}
+if ($id_min>$id_max) {
+	fwrite(STDERR, "RANGE ERROR $id_min>$id_max\n");
+	#db_close();
+	exit(3);
+}
+$id_cnt = $id_max-$id_min + 1;
+
+# Simulation mode
+if ($stam_cfg['simulation']) {
+	fwrite(STDERR, "============ ID-MOVETO SIMULATION: $id_min..$id_max :: $newcat\n");
+	#db_close();
+	exit(0);
+}
+
+$res = db_query("SELECT id, cat, txt FROM stam_entries WHERE
+	id >= '".db_real_escape_string($id_min)."'
+	AND id <= '".db_real_escape_string($id_max)."'
+	");
+if (!$res) {
+	fwrite(STDERR, db_error()."\n");
+	#db_close();
+	exit(1);
+}
+while ($row = db_fetch_array($res)) {
+	$id     = $row['id'];
+	$oldcat = $row['cat'];
+	$txt    = $row['txt'];
+
+	if ($oldcat == $newcat) {
+		echo "ID $id is already in <$oldcat>: $txt\n";
+		continue; // not affected
+	}
+
+	$x = db_query("UPDATE stam_entries SET
+		cat = '".db_real_escape_string($newcat)."'
+		WHERE
+		id = '".db_real_escape_string($id)."'
+		");
+	if (!$x) {
+		fwrite(STDERR, db_error()."\n");
+		#db_close();
+		exit(1);
+	}
+
+	$afr = db_affected_rows();
+	if ($afr != 1) {
+		fwrite(STDERR, "Error: Could not update $id <$oldcat> '$txt'\n");
+		#db_close();
+		exit(1);
+	} else {
+		echo green("OK! Moved $id from '$oldcat' to '$newcat': $txt\n");
+	}
+}
+
+# ---
+
+function green($txt) {
+	return "\033[1;32;40m".$txt."\033[0m";
+}
+

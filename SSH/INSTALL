@@ -1,0 +1,61 @@
+How to install StackMan Terminal Edition
+----------------------------------------
+
+1. Create a new Linux user, for example
+
+	sudo useradd stamuser
+	sudo groupadd stamuser
+
+2. Copy the stam program archive to the user's folder and unpack it
+
+	su stamuser
+	cd ~
+	tar -xvf stackmanager_linux.tar.gz
+	sudo chown -r stamuser:stamuser ~stamuser/stam
+
+3. Optional: If you want to avoid direct shell access, you make stam the default shell. For example, the user's entry in /etc/passwd could look like this:
+
+	stamuser:x:1002:1004:StackMan Terminal Edition,,,:/home/stamuser:/home/stamuser/stam/stam
+
+4. Create a MySQL database (and users) and import the following SQL dump:
+
+	stam_entries.sql
+
+5. Copy the default configuration file to the home directory of the user and edit it (add the MySQL data).
+
+	Method 1:
+
+		su stamuser
+		cp ~/stam/defaults/.stam_config ~
+		nano ~/.stam_config
+
+	Method 2:
+
+		su stamuser
+		~/stam/write_stam_config
+
+6. Copy the nanorc file (for syntax highlighting) and, if necessary correct the path to stam.nanorc to the absolute path of your user:
+
+	su stamuser
+	cp ~/stam/nanorc/.nanorc ~
+	rnano ~/.nanorc
+
+	You can test the syntax highlight with this command:
+
+	nano ~/stam/nanorc/test.stam
+
+7. Optional: If you want to create a live-backup on a external media (e.g. floppy disk or USB flash drive), you can create a symlink for the second history file 
+
+	sudo mkdir /mnt/fdd
+	sudo mount -o umask=0000,gid=1004,uid=1002 /dev/sda /mnt/fdd
+	su stamuser
+	touch /mnt/fdd/stam_history
+	ln -s /mnt/fdd/stam_history ~/.stam_history_mir
+
+---
+
+Additional notes:
+
+- If you want to run *.stam scripts, you have to correct the shebang to the correct location of the stam executable (#!/.../stam), and make the files executable (chmod +x test.stam)
+
+- You can begin with running ~/stam/stam and enter "-help" to view all available commands.

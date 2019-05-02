@@ -1,0 +1,2 @@
+#!/bin/bash
+mysqldump --flush-privileges --force --dump-date --create-options --opt --extended-insert=FALSE --tz-utc --comments --quote-names --quick --complete-insert --lock-tables -- "$1"

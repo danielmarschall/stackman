@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Get the directory of this script (also works with symlinks)
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+	DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+	SOURCE="$(readlink "$SOURCE")"
+	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+inputfile="$1"
+if [ ! -f "$inputfile" ]; then
+	echo "ERROR: file '$inputfile' does not exist." 1>&2
+fi
+shift
+
+category=$( echo $@ )
+if [[ "$category" == "" ]]; then
+	echo "Syntax: $0 <inputfile> <category>" 1>&2
+	exit 2
+fi
+shift
+
+# Process
+cat "$inputfile" | "$DIR"/app "$category"

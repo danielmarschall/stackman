@@ -1,0 +1,17 @@
+#!/bin/bash
+
+read -erp "MySQL Host: " m_host
+read -erp "MySQL User: " m_user
+read -erp "MySQL Password: " m_pass
+read -erp "MySQL Database: " m_base
+read -erp "Simulation mode (0 or 1)?: " m_simulation
+
+echo "db_host=${m_host}" >  ~/.stam_config
+echo "db_user=${m_user}" >> ~/.stam_config
+echo "db_pass=${m_pass}" >> ~/.stam_config
+echo "db_base=${m_base}" >> ~/.stam_config
+echo "" >> ~/.stam_config
+echo "simulation=${m_simulation}" >> ~/.stam_config
+
+exit 0
+

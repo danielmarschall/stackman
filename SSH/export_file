@@ -1,0 +1,38 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/wildcard.inc.php';
+
+array_shift($argv);
+#if (!isset($argv[0]) || (trim($argv[0])=='')) $argv[0] = '*';
+if (!isset($argv[0])) $argv[0] = ''; # keine wildcards erlauben
+
+$arg = trim(implode(' ', $argv));
+# while ($arg = array_shift($argv)) {
+#	$wildcard = trim(mywc($arg));
+	$wildcard = trim($arg); # keine wildcards erlauben
+
+	$res = db_query("SELECT * FROM stam_entries
+		WHERE cat LIKE '".db_real_escape_string($wildcard)."'
+		AND state != 'S'
+		ORDER BY ts ASC, cat ASC");
+	if (!$res) {
+		fwrite(STDERR, db_error()."\n");
+		db_close();
+		exit(1);
+	}
+	if (db_num_rows($res) == 0) {
+		fwrite(STDERR, "Category '$wildcard' not found!\n");
+		exit(1);
+	}
+	while ($row = db_fetch_array($res)) {
+		$id  = $row['id'];
+		$cat = $row['cat'];
+		$txt = $row['txt'];
+		$src = $row['src'];
+		$ts  = $row['ts'];
+		$short_ts = date('d.m.y H:i', strtotime($ts));
+		echo "$txt\n";
+	}
+# }

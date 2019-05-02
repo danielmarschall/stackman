@@ -1,0 +1,316 @@
+#!/bin/bash
+
+# Get the directory of this script (also works with symlinks)
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+	DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+	SOURCE="$(readlink "$SOURCE")"
+	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# ToDo for Future: Implement getopt
+if [[ "$1" == "--batchmode" ]]; then
+	IS_BATCHMODE=1
+else
+	IS_BATCHMODE=0
+fi
+
+# Read in the system identifier
+if [ $IS_BATCHMODE -eq 0 ]; then
+	echo "Terminal Stackman 2.3"
+	echo "(C) 2013-2017 ViaThinkSoft"
+	echo ""
+
+	if [ -f ~/".autorun" ]; then
+		echo "Starting autorun script..."
+		~/".autorun"
+		echo ""
+	fi
+
+	sysid=$( "$DIR"/sysname )
+	echo "System ID: lta:$sysid"
+	echo ""
+	echo "Enter '-help' for available commands."
+	echo ""
+fi
+
+# Check MySQL config
+"$DIR"/check_db_conn -q
+if [ $? -ne 0 ]; then
+	# TODO: fragen ob man write_stam_config aufrufen möchte
+	exit 1
+fi
+
+DEFAULTCAT="."
+
+CURCAT="$DEFAULTCAT"
+PREV_CAT="$DEFAULTCAT"
+LAST_ID=-1
+
+echo_yellow() {
+	echo -ne "\033[1;33;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+echo_red() {
+	echo -ne "\033[1;31;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+echo_cyan() {
+	echo -ne "\033[1;36;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+echo_green() {
+	echo -ne "\033[1;32;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+# Main menu
+while (( 1 )); do
+	# Warning if category does not exist yet.
+	"$DIR"/exists1 "$CURCAT"
+	if [ $? -eq 1 ]; then
+		SIGN="*"
+	else
+		SIGN="+"
+	fi
+
+	# "-r" übernimmt alle "\". gut für z.B. "\\netbios\", schlecht für "\" am zeilenende, um weiterzuschreiben
+	read -erp "<$CURCAT> $SIGN " inp
+	if [[ $? -gt 0 ]]; then
+		# For example end of stream -- exit
+		break
+	fi
+
+	# Log to journal
+	echo "$inp" >> ~/.stam_history
+	if [ -f ~/.stam_history_mir ]; then
+		echo "$inp" >> ~/.stam_history_mir
+	fi
+
+	# Split command and (single combined) argument
+	cmd=$( echo "$inp" | cut    -d " " -f 1  )
+	arg=$( echo "$inp" | cut -s -d " " -f 2- )
+
+	# Commands begin with '-'. The first character can be escaped by using '--'
+	echo "$cmd" | grep -E "^-" > /dev/null
+	COMMANDMODE=$?
+	echo "$cmd" | grep -E "^--" > /dev/null
+	if [ $? -eq 0 ]; then
+		cmd="${cmd:1}"
+		# 1=nein, 0=ja
+		COMMANDMODE=1
+	fi
+
+	# Category will be changed with '#'. The first character can be escaped by using '##'
+	echo "$cmd" | grep -E "^#" > /dev/null
+	CATCHANGE=$?
+	echo "$cmd" | grep -E "^##" > /dev/null
+	if [ $? -eq 0 ]; then
+		cmd="${cmd:1}"
+		# 1=nein, 0=ja
+		CATCHANGE=1
+	fi
+
+	if [ $CATCHANGE -eq 0 ]; then
+		PREV_CAT="$CURCAT"
+
+		# Change category: "#<cat>"
+		cmd="-"
+		arg=$( echo "$inp" | sed 's/^#//' )
+
+		# Do not allow empty category (reserved for '*')
+		if [[ "$arg" == "" ]]; then
+			# echo_red "[!] FATAL ERROR: Category cannot be empty!"
+			# continue
+			arg="$DEFAULTCAT"
+		fi
+
+		# change category
+		CURCAT="$arg"
+
+#		if [ $IS_BATCHMODE -eq 0 ]; then
+#			echo_green "Your category is now '$CURCAT'"
+#		fi
+
+		# Warning if category does not exist yet.
+		"$DIR"/exists1 "$CURCAT"
+		if [ $? -eq 1 ]; then
+			echo_yellow "(i) Note: The category does not exist and will be created if you continue:"
+			echo_yellow "          $CURCAT"
+		fi
+	elif [ $COMMANDMODE -eq 0 ]; then
+		# Command mode: "-<cmd> [<arg>]"
+		cmd="${cmd:1}"
+
+		# Kommando verarbeiten
+		if [[ "$cmd" == "listcat" || "$cmd" == "ls" || "$cmd" == "lc" ]]; then
+			# List categories
+			"$DIR"/listcat "$arg" | less
+		elif [[ "$cmd" == "strike" || "$cmd" == "str" ]]; then
+			# Strike entry
+			if [[ "$arg" == "last" ]]; then
+				arg=$LAST_ID
+			fi
+			"$DIR"/str "$arg"
+		elif [[ "$cmd" == "unstrike" || "$cmd" == "unstr" ]]; then
+			# Un-Strike entry
+			if [[ "$arg" == "last" ]]; then
+				arg=$LAST_ID
+			fi
+			"$DIR"/unstr "$arg"
+		elif [[ "$cmd" == "singleadd" || "$cmd" == "sa" || "$cmd" == "as" || "$cmd" == "appendsingle" || "$cmd" == "aps" ]]; then
+			array=(${arg// / })
+			CAT="${array[0]}"
+			TXT="${array[@]:1}"
+
+			# Warning if category does not exist yet.
+			"$DIR"/exists1 "$CAT"
+			if [ $? -eq 1 ]; then
+				echo_yellow "(i) Note: Category '$CAT' will be created."
+			fi
+
+			OUT=$( "$DIR"/aps "$CAT" "$TXT" )
+			EC=$?
+			echo -n "$OUT"
+			if [ $EC -ne 0 ]; then
+				echo_red "[!] FATAL ERROR: Could not append the entry!" 1>&2
+			else
+				LAST_ID=$( echo "$OUT" | sed -r 's/^.*OK! ([[:digit:]]+).*$/\1/g' )
+			fi
+		elif [[ "$cmd" == "movefromid" || "$cmd" == "mfi" ]]; then
+			# Move ID $arg to category $CURCAT
+			if [[ "$arg" == "last" ]]; then
+				arg=$LAST_ID
+			fi
+			"$DIR"/id_move "$CURCAT" "$arg"
+		elif [[ "$cmd" == "movefromcat" || "$cmd" == "mfc" ]]; then
+			# Move CAT $arg to category $CURCAT
+			"$DIR"/cat_move "$CURCAT" "$arg"
+		elif [[ "$cmd" == "listent" || "$cmd" == "le" ]]; then
+			# List entries
+			"$DIR"/listent "$arg" | less
+		elif [[ "$cmd" == "listcurent" || "$cmd" == "lce" ]]; then
+			# List current entries
+			"$DIR"/listent "$CURCAT" | less
+		elif [[ "$cmd" == "clear" || "$cmd" == "cls" ]]; then
+			clear
+		elif [[ "$cmd" == "batch" || "$cmd" == "bat" ]]; then
+			TMPFIL=$( mktemp --suffix=.stam )
+			# TODO: can the .nanorc file be enforced?
+			nano -Y stam -- "$TMPFIL"
+			if [ -f "$TMPFIL" ]; then
+				echo_cyan "Processing batch script..."
+				"$0" --batchmode < "$TMPFIL"
+				rm "$TMPFIL"
+				echo_cyan "Batch finished!"
+			else
+				echo_yellow "No data entered in batch mode editor. Cancelled."
+			fi
+		elif [[ "$cmd" == "sub" || "$cmd" == "su" ]]; then
+			# At the moment, we do not use '--subshell'
+			"$0" --subshell
+		elif [[ "$cmd" == "back" || "$cmd" == "b" ]]; then
+			X_PREV_CAT="$CURCAT"
+
+			# change category
+			CURCAT="$PREV_CAT"
+
+#			if [ $IS_BATCHMODE -eq 0 ]; then
+#				echo_green "Your category is now '$CURCAT'"
+#			fi
+
+			# Warning if category does not exist yet.
+			"$DIR"/exists1 "$CURCAT"
+			if [ $? -eq 1 ]; then
+				echo_yellow "(i) Note: The category does not exist and will be created if you continue:"
+				echo_yellow "          $CURCAT"
+			fi
+
+			# Special ability: Allow that you can go forward again
+			PREV_CAT="$X_PREV_CAT"
+		elif [[ "$cmd" == "showhistory" || "$cmd" == "shi" ]]; then
+			# Leider enth�lt das nicht die Ausgaben :-(
+			cat ~/.stam_history | less
+		elif [[ "$cmd" == "help" || "$cmd" == "h" || "$cmd" == "?" ]]; then
+			echo_cyan "#<cat>"
+			echo -e "\tChange category. Parameter: Category"
+			echo -e "\tUse '##' at the beginning, if you want to create an entry beginning with '#'."
+			echo_cyan "-(back|b)"
+			echo -e "\tSwitch to previous used category"
+			echo_cyan "-(strike|str) <id>"
+			echo -e "\tStrike entry <id>"
+			echo -e "\t<id> can have ranges using '<min>-<max>' or be 'last' for the last inserted ID."
+			echo_cyan "-(singleadd|sa|as|appendsingle|aps) <cat> <entry>"
+			echo -e "\tAdd <entry> to category <cat> without changing the category."
+			echo -e "\t<cat> may not contain a white space"
+			echo_cyan "-(unstrike|unstr) <id>"
+			echo -e "\tUn-Strike entry <id>"
+			echo -e "\t<id> can have ranges using '<min>-<max>' or be 'last' for the last inserted ID."
+			echo_cyan "-(movefromid|mfi) <id>"
+			echo -e "\tMove ID <id> to the current selected category"
+			echo -e "\t<id> can have ranges using '<min>-<max>' or be 'last' for the last inserted ID."
+			echo_cyan "-(movefromcat|mfc) <cat>"
+			echo -e "\tMove all entries of category <cat> to the current selected category"
+			echo -e "\t<cat> can have wildcards (*)"
+			echo_cyan "-(listent|le) [<cat>]"
+			echo -e "\tShow all entries. Optional parameter: Category"
+			echo -e "\t<cat> can have wildcards (*)"
+			echo_cyan "-(listcurent|lce)"
+			echo -e "\tShow all entries of the selected category."
+			echo_cyan "-(listcat|ls|lc) [<cat>]"
+			echo -e "\tShow all categories. Optional parameter: Category"
+			echo -e "\t<cat> can have wildcards (*)"
+			echo_cyan "-(clear|cls)"
+			echo -e "\tClears the screen"
+			echo_cyan "-(batch|bat)"
+			echo -e "\tEnters batch mode (opens a subshell, without keeping your current category!)"
+			echo_cyan "-(sub|su)"
+			echo -e "\tEnters subshell mode"
+			echo_cyan "-(showhistory|shi)"
+			echo -e "\tShow history of all entered commands"
+			echo_cyan "-(help|h|?)"
+			echo -e "\tThis help screen"
+			echo_cyan "-(exit|quit|x|q)"
+			echo -e "\tExits the program"
+		elif [[ "$cmd" == "exit" || "$cmd" == "quit" || "$cmd" == "x" || "$cmd" == "q" ]]; then
+			# Exit the program
+			break
+		else
+			# Unknown command
+			echo_red "[!] FATAL ERROR: Unknown command '$cmd'. Use '-help' for available commands." 1>&2
+			echo_red "    If you want to add an entry, Use '--' to escape the first character." 1<&2
+		fi
+	else
+		# (Blind) appender mode
+
+		# Keine leeren Zeilen (ist das OK?)
+		if [[ "$inp" == "" ]]; then
+			continue
+		fi
+
+		# Add single entry (aps)
+		OUT=$( "$DIR"/aps "$CURCAT" "$inp" )
+		EC=$?
+		echo -n "$OUT"
+		if [ $EC -ne 0 ]; then
+			echo_red "[!] FATAL ERROR: Could not append the entry!" 1>&2
+		else
+			LAST_ID=$( echo "$OUT" | sed -r 's/^.*OK! ([[:digit:]]+).*$/\1/g' )
+		fi
+	fi
+done
+
+if [ $IS_BATCHMODE -eq 0 ]; then
+	echo ""
+	echo "Goodbye."
+fi
+

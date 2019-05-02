@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/src.inc.php';
+
+$min = 1;
+
+$res = db_query("select max(id) as cnt from stam_entries");
+$row = db_fetch_array($res);
+$max = $row['cnt'];
+
+echo "Search gaps between $min and $max\n";
+
+for ($i=$min; $i<=$max; $i++) {
+
+	$res = db_query("select count(*) as cnt from stam_entries where id = $i");
+	$row = db_fetch_array($res);
+	if ($row['cnt'] != 1) echo "Fehler: $i\n";
+
+}
+
+echo "Finished searching for gaps\n";

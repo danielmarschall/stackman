@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Get the directory of this script (also works with symlinks)
+# http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+	DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+	SOURCE="$(readlink "$SOURCE")"
+	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# Check MySQL config
+"$DIR"/check_db_conn -q
+if [ $? -ne 0 ]; then
+	# TODO: fragen ob man write_stam_config aufrufen möchte
+	exit 1
+fi
+
+echo_yellow() {
+	echo -ne "\033[1;33;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+echo_red() {
+	echo -ne "\033[1;31;40m"
+	echo "$*"
+	echo -ne "\033[0m"
+}
+
+#categ="$1"
+categ=$( echo $@ )
+if [[ "$categ" == "" ]]; then
+	echo "Syntax: $0 <entry>" 1>&2
+	exit 2
+fi
+
+# Do not allow empty category (reserved for '*')
+if [[ "$categ" == "" ]]; then
+	echo_red "[!] FATAL ERROR: Category cannot be empty!"
+	exit 1
+fi
+
+# Warning if it does not exist yet.
+"$DIR"/exists1 "$categ"
+if [ $? -eq 1 ]; then
+	echo_yellow "(i) Note: The category does not exist and will be created if you continue:"
+	echo_yellow "          $categ"
+	SIGN="*"
+else
+	SIGN="+"
+fi
+
+while (( 1 )); do
+	# "-r" übernimmt alle "\". gut für z.B. "\\netbios\", schlecht für "\" am zeilenende, um weiterzuschreiben
+	read -erp "<$categ> $SIGN " entry
+	if [[ $? -gt 0 ]]; then
+		# For example end of stream -- exit
+		break
+	fi
+
+	# Keine leeren Zeilen (ist das OK?)
+	if [[ "$entry" == "" ]]; then
+		continue
+	fi
+
+	# Eintrag hinzufügen
+	"$DIR"/aps "$categ" "$entry"
+	if [ $? -ne 0 ]; then
+		echo_red "[!] FATAL ERROR: Could not append the entry!" 1>&2
+	else
+		SIGN="+"
+	fi
+done

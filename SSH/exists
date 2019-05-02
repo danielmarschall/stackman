@@ -1,0 +1,27 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/wildcard.inc.php';
+
+array_shift($argv);
+if (!isset($argv[0]) || (trim($argv[0])=='')) $argv[0] = '*';
+
+$arg = trim(implode(' ', $argv));
+# while ($arg = array_shift($argv)) {
+	$wildcard = trim(mywc($arg));
+
+	$res = db_query("SELECT DISTINCT cat FROM stam_entries
+		WHERE cat LIKE '".db_real_escape_string($wildcard)."'
+		AND state != 'S'
+		ORDER BY ts ASC, cat ASC");
+	if (!$res) {
+		fwrite(STDERR, db_error()."\n");
+		db_close();
+		exit(1);
+	}
+	while ($row = db_fetch_array($res)) {
+		exit(0);
+	}
+	exit(1);
+# }

@@ -1,0 +1,151 @@
+#!/usr/bin/stam
+
+-unknowncommand
+-unknowncommand xyz
+
+#categorychange
+#category with spaces
+##append string with '#' beginning
+any other string
+--append a string with '-' beginning
+
+(no parameters allowed)
+-b
+-back
+-b invalid parameters
+-back invalid parameters
+
+(requires <id> as paramter)
+-strike
+-str
+-strike 123
+-str 123
+-strike 123-456
+-str 123-456
+-strike last
+-str last
+-strike 123 invalid
+-str 123 invalid
+-strike invalid invalid
+-str invalid invalid
+
+(requires <cat> and <entry> as parameters)
+-singleadd
+-sa
+-as
+-singleadd cat
+-sa cat
+-as cat
+-singleadd cat entries with space
+-sa cat entries with space
+-as cat entries with space
+-appendsingle cat entries with space
+-aps cat entries with space
+
+(requires <id> as paramter)
+-unstrike
+-unstr
+-unstrike 123
+-unstr 123
+-unstrike 123-456
+-unstr 123-456
+-unstrike last
+-unstr last
+-unstrike 123 invalid
+-unstr 123 invalid
+-unstrike invalid invalid
+-unstr invalid invalid
+
+(requires <id> as paramter)
+-movefromid
+-mfi
+-movefromid 123
+-mfi 123
+-movefromid 123-456
+-mfi 123-456
+-movefromid last
+-mfi last
+-movefromid 123 invalid
+-mfi 123 invalid
+-movefromid invalid invalid
+-mfi invalid invalid
+
+(requires <cat> as paramter)
+-movefromcat
+-mfc
+-movefromcat cat
+-mfc cat
+-movefromcat ca*t
+-mfc ca*t
+-movefromcat cat invalid
+-mfc cat invalid
+-movefromcat ca*t invalid
+-mfc ca*t invalid
+
+(parameter <cat> is optional)
+-le
+-listent
+-le category with spaces
+-listent category with spaces
+-le cate*gory with spaces
+-listent cate*gory with spaces
+
+(no parameters allowed)
+-listcurent
+-lce
+-listcurent invalid
+-lce invalid
+
+(parameter <cat> is optional)
+-listcat
+-ls
+-lc
+-listcat cat with spaces
+-ls cat with spaces
+-lc cat with spaces
+-listcat cat w*ith spaces
+-ls cat w*ith spaces
+-lc cat w*ith spaces
+
+(no parameters allowed)
+-clear
+-cls
+-clear invalid
+-cls invalid
+
+(no parameters allowed)
+-batch
+-bat
+-batch invalid
+-bat invalid
+
+(no parameters allowed)
+-sub
+-su
+-sub invalid
+-su invalid
+
+(no parameters allowed)
+-showhistory
+-shi
+-showhistory invalid
+-shi invalid
+
+(no parameters allowed)
+-help
+-h
+-?
+-help invalid
+-h invalid
+-? invalid
+
+(no parameters allowed)
+-exit
+-quit
+-x
+-q
+-exit invalid
+-quit invalid
+-x invalid
+-q invalid
+

@@ -19,8 +19,8 @@ fi
 
 # Read in the system identifier
 if [ $IS_BATCHMODE -eq 0 ]; then
-	echo "Terminal Stackman 2.3"
-	echo "(C) 2013-2017 ViaThinkSoft"
+	echo "Terminal Stackman 2.4"
+	echo "(C) 2013-2019 ViaThinkSoft"
 	echo ""
 
 	if [ -f ~/".autorun" ]; then
@@ -95,6 +95,7 @@ while (( 1 )); do
 	if [ -f ~/.stam_history_mir ]; then
 		echo "$inp" >> ~/.stam_history_mir
 	fi
+	"$DIR"/weblog_add "$inp"
 
 	# Split command and (single combined) argument
 	cmd=$( echo "$inp" | cut    -d " " -f 1  )

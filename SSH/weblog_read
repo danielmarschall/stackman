@@ -1,0 +1,47 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/includes/db.inc.php';
+require_once __DIR__ . '/includes/src.inc.php';
+
+if ($argc <> 1) {
+	echo "Syntax: $argv[0]\n";
+	exit(2);
+}
+
+if (isset($stam_cfg['weblog_host']) && !empty($stam_cfg['weblog_host'])) {
+	db_close();
+
+	$weblog_host = $stam_cfg['weblog_host'];
+	$weblog_user = $stam_cfg['weblog_user'];
+	$weblog_pass = $stam_cfg['weblog_pass'];
+	$weblog_base = $stam_cfg['weblog_base'];
+
+	if (!db_connect($weblog_host, $weblog_user, $weblog_pass)) {
+		fwrite(STDERR, "Weblog MySQL connect error\n");
+		exit(2);
+	}
+
+	if (!db_select_db($weblog_base)) {
+		fwrite(STDERR, "Weblog MySQL DB select error\n");
+		weblog_close();
+		exit(2);
+	}
+
+	$res = db_query("select * from stam_weblog order by id asc");
+	while ($row = db_fetch_array($res)) {
+		$ent = $row['inp'];
+		if (isset($stam_cfg['weblog_password']) && !empty($stam_cfg['weblog_password'])) {
+			$iv = 'AAAAAAAAAAAAAAAA';
+			$ent = openssl_decrypt(base64_decode($ent), 'AES-128-CBC', $stam_cfg['weblog_password'], OPENSSL_RAW_DATA, $iv);
+		}
+		echo $row['ts'] . ': ' . $ent . "\n";
+
+	}
+}
+
+# ---
+
+function green($txt) {
+	return "\033[1;32;40m".$txt."\033[0m";
+}

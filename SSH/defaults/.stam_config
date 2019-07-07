@@ -7,4 +7,10 @@ db_user=root
 db_pass=
 db_base=stackman
 
+weblog_host=localhost
+weblog_user=root
+weblog_pass=
+weblog_base=stackman
+weblog_password=
+
 simulation=0

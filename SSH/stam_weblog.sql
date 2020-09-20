@@ -1,6 +1,6 @@
 CREATE TABLE `stam_weblog` (
   `id` int(21) NOT NULL AUTO_INCREMENT,
   `ts` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `inp` varchar(1024) NOT NULL,
+  `inp` varchar(32000) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

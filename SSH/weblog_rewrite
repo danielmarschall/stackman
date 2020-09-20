@@ -55,7 +55,7 @@ if (isset($stam_cfg['weblog_host']) && !empty($stam_cfg['weblog_host'])) {
 			exit(1);
 		}
 
-		echo green("Weblog written <$id> <$ent>!\n");
+		echo green("Weblog written!\n");
 	}
 }
 

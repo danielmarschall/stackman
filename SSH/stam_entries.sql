@@ -6,4 +6,4 @@ CREATE TABLE `stam_entries` (
   `state` enum('E','S') NOT NULL DEFAULT 'E',
   `src` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

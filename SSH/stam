@@ -19,8 +19,8 @@ fi
 
 # Read in the system identifier
 if [ $IS_BATCHMODE -eq 0 ]; then
-	echo "Terminal Stackman 2.4"
-	echo "(C) 2013-2019 ViaThinkSoft"
+	echo "Terminal Stackman 2.4.1"
+	echo "(C) 2013-2020 ViaThinkSoft"
 	echo ""
 
 	if [ -f ~/".autorun" ]; then
@@ -88,6 +88,11 @@ while (( 1 )); do
 	if [[ $? -gt 0 ]]; then
 		# For example end of stream -- exit
 		break
+	fi
+
+	# No empty lines
+	if [[ "$inp" == "" ]]; then
+		continue
 	fi
 
 	# Log to journal
@@ -292,11 +297,6 @@ while (( 1 )); do
 		fi
 	else
 		# (Blind) appender mode
-
-		# Keine leeren Zeilen (ist das OK?)
-		if [[ "$inp" == "" ]]; then
-			continue
-		fi
 
 		# Add single entry (aps)
 		OUT=$( "$DIR"/aps "$CURCAT" "$inp" )

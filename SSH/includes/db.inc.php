@@ -4,6 +4,12 @@ $vts_mysqli = null;
 
 # ---
 
+$stam_cfg = array();
+$stam_cfg['db_host'] = null;
+$stam_cfg['db_user'] = null;
+$stam_cfg['db_pass'] = null;
+$stam_cfg['db_base'] = null;
+
 require __DIR__ . '/config.inc.php';
 
 $db_host = $stam_cfg['db_host'];
@@ -43,10 +49,11 @@ function db_connect($server=null, $username=null, $password=null, $new_link=fals
 	global $vts_mysqli;
 	$ary = explode(':', $server);
 	$host = $ary[0];
-	$port = isset($ary[1]) ? $ary[1] : ini_get("mysqli.default_port");
-	if (is_null($server)) $port = ini_get("mysqli.default_host");
-	if (is_null($username)) $port = ini_get("mysqli.default_user");
-	if (is_null($password)) $port = ini_get("mysqli.default_password");
+	$ini_port = ini_get("mysqli.default_port");
+	$port = isset($ary[1]) ? (int)$ary[1] : ($ini_port ? (int)$ini_port : 3306);
+	if (is_null($server)) $server = ini_get("mysqli.default_host");
+	if (is_null($username)) $username = ini_get("mysqli.default_user");
+	if (is_null($password)) $password = ini_get("mysqli.default_password");
 	$vts_mysqli = new mysqli($host, $username, $password, /*dbname*/'', $port, ini_get("mysqli.default_socket"));
 	return (empty($vts_mysqli->connect_error) && ($vts_mysqli->connect_errno == 0)) ? $vts_mysqli : false;
 }

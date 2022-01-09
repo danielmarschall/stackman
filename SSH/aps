@@ -2,7 +2,13 @@
 <?php
 
 require_once __DIR__ . '/includes/db.inc.php';
+
+$src = '???';
 require_once __DIR__ . '/includes/src.inc.php';
+
+$stam_cfg = array();
+$stam_cfg['simulation'] = false;
+require_once __DIR__ . '/includes/config.inc.php';
 
 if ($argc <> 3) {
 	echo "Syntax: $argv[0] <cat> <entry>\n";

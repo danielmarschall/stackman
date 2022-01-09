@@ -24,7 +24,7 @@ if (isset($stam_cfg['weblog_host']) && !empty($stam_cfg['weblog_host'])) {
 
 	if (!db_select_db($weblog_base)) {
 		fwrite(STDERR, "Weblog MySQL DB select error\n");
-		weblog_close();
+		db_close();
 		exit(2);
 	}
 

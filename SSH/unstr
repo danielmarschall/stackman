@@ -4,6 +4,10 @@
 require_once __DIR__ . '/includes/db.inc.php';
 require_once __DIR__ . '/includes/src.inc.php';
 
+$stam_cfg = array();
+$stam_cfg['simulation'] = false;
+require_once __DIR__ . '/includes/config.inc.php';
+
 if ($argc <> 2) {
 	echo "Syntax: $argv[0] <id>\n";
 	#db_close();
@@ -26,12 +30,14 @@ if (($id_min == 0) || ($id_max == 0)) {
 	#db_close();
 	exit(3);
 }
+$id_min = (int)$id_min;
+$id_max = (int)$id_max;
 if ($id_min>$id_max) {
 	fwrite(STDERR, "RANGE ERROR $id_min>$id_max\n");
 	#db_close();
 	exit(3);
 }
-$id_cnt = $id_max-$id_min + 1;
+$id_cnt = $id_max - $id_min + 1;
 
 # Simulation mode
 if ($stam_cfg['simulation']) {

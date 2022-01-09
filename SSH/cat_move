@@ -5,6 +5,10 @@ require_once __DIR__ . '/includes/db.inc.php';
 require_once __DIR__ . '/includes/src.inc.php';
 require_once __DIR__ . '/includes/wildcard.inc.php';
 
+$stam_cfg = array();
+$stam_cfg['simulation'] = false;
+require_once __DIR__ . '/includes/config.inc.php';
+
 if ($argc < 3) {
 	echo "Syntax: $argv[0] <newCategory> <categoryWildcard>\n";
 	#db_close();

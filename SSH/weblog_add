@@ -70,9 +70,6 @@ if (isset($stam_cfg['weblog2_system']) && !empty($stam_cfg['weblog2_system'])) {
 
 
 
-	}
-
-
 
 }
 

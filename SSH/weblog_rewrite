@@ -9,6 +9,83 @@ if ($argc <> 1) {
 	exit(2);
 }
 
+if (isset($stam_cfg['weblog2_system']) && !empty($stam_cfg['weblog2_system'])) {
+
+
+
+	$home = posix_getpwuid(posix_getuid())['dir'];
+	$ents = file($home.'/.stam_history');
+	foreach ($ents as $ent) {
+		$ent = rtrim($ent);
+		if (isset($stam_cfg['weblog_password']) && !empty($stam_cfg['weblog_password'])) {
+			$iv = 'AAAAAAAAAAAAAAAA';
+			$ent = base64_encode(openssl_encrypt($ent, 'AES-128-CBC', $stam_cfg['weblog_password'], OPENSSL_RAW_DATA, $iv));
+		}
+
+# ---
+
+
+	$oidplus_rest_auth = $stam_cfg['weblog2_auth'];
+
+	/*
+	$data = array();
+	$ch = curl_init($stam_cfg['weblog2_system']."rest/v1/objects/oid:".$stam_cfg['weblog2_oid']);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer $oidplus_rest_auth"));
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	$i=0; for($i=0;$i<10;$i++) { $response = curl_exec($ch); if ($response) { break; } else { sleep(1); } }
+	if ((!$response) || (json_decode($response,true)['status'] < 0))
+	{
+		fwrite(STDERR, "Weblog GET failed: $response\n");
+		#weblog_close();
+		exit(2);
+	}
+	#echo "$response\n\n";
+	$children = json_decode($response,true)['children'];
+	if (count($children) == 0) {
+		$lfd = 1;
+	} else {
+		natsort($children);
+		$last = end($children);
+		$arcs = explode('.', $last);
+		$lfd = end($arcs)+1;
+	}
+	*/
+
+	$lfd = floor(microtime(true)*10000);
+
+	$data = array("title" => "STAM Weblog Entry", "description" => $ent, "ra_email" => "info@daniel-marschall.de");
+	$ch = curl_init($stam_cfg['weblog2_system']."rest/v1/objects/oid:".$stam_cfg['weblog2_oid'].".".$lfd);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer $oidplus_rest_auth"));
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	$i=0; for($i=0;$i<10;$i++) { $response = curl_exec($ch); if ($response) { break; } else { sleep(1); } }
+	if ((!$response) || (json_decode($response,true)['status'] < 0))
+	{
+		fwrite(STDERR, "Weblog POST failed: $response\n");
+		#weblog_close();
+		exit(2);
+	}
+	#echo "$response\n\n";
+
+	echo green("Weblog written (".$stam_cfg['weblog2_oid'].".$lfd)!\n");
+
+# ---
+
+
+
+
+
+	}
+
+
+
+}
+
 if (isset($stam_cfg['weblog_host']) && !empty($stam_cfg['weblog_host'])) {
 	db_close();
 
@@ -33,6 +110,7 @@ if (isset($stam_cfg['weblog_host']) && !empty($stam_cfg['weblog_host'])) {
 	$home = posix_getpwuid(posix_getuid())['dir'];
 	$ents = file($home.'/.stam_history');
 	foreach ($ents as $ent) {
+		$ent = rtrim($ent);
 		if (isset($stam_cfg['weblog_password']) && !empty($stam_cfg['weblog_password'])) {
 			$iv = 'AAAAAAAAAAAAAAAA';
 			$ent = base64_encode(openssl_encrypt($ent, 'AES-128-CBC', $stam_cfg['weblog_password'], OPENSSL_RAW_DATA, $iv));

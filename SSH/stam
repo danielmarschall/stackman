@@ -19,8 +19,8 @@ fi
 
 # Read in the system identifier
 if [ $IS_BATCHMODE -eq 0 ]; then
-	echo "Terminal Stackman 2.4.1"
-	echo "(C) 2013-2020 ViaThinkSoft"
+	echo "Terminal Stackman 2.5"
+	echo "(C) 2013-2023 ViaThinkSoft"
 	echo ""
 
 	if [ -f ~/".autorun" ]; then

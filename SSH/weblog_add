@@ -14,6 +14,11 @@ if (isset($stam_cfg['weblog2_system']) && !empty($stam_cfg['weblog2_system'])) {
 
 	$ent = rtrim($argv[1]);
 
+	if (isset($stam_cfg['weblog_password']) && !empty($stam_cfg['weblog_password'])) {
+		$iv = 'AAAAAAAAAAAAAAAA';
+		$ent = base64_encode(openssl_encrypt($ent, 'AES-128-CBC', $stam_cfg['weblog_password'], OPENSSL_RAW_DATA, $iv));
+	}
+
 # ---
 
 

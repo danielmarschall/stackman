@@ -1,8 +1,6 @@
 ; StackMan Setup Script for InnoSetup
 ; by Daniel Marschall
 
-; http://www.daniel-marschall.de/
-
 ; ToDo:
 ; - For all users or only for me
 ; - Entry in quick launch
@@ -13,9 +11,9 @@ AppVerName=StackManager 5.1
 AppVersion=5.1
 AppCopyright=© Copyright 2009 - 2010 ViaThinkSoft
 AppPublisher=ViaThinkSoft
-AppPublisherURL=http://www.viathinksoft.de/
-AppSupportURL=http://www.daniel-marschall.de/
-AppUpdatesURL=http://www.viathinksoft.de/
+AppPublisherURL=https://www.viathinksoft.de/
+AppSupportURL=https://www.daniel-marschall.de/
+AppUpdatesURL=https://www.viathinksoft.de/
 DefaultDirName={autopf}\Stack Manager
 DefaultGroupName=Stack Manager
 VersionInfoCompany=ViaThinkSoft
@@ -45,7 +43,7 @@ Name: "desktopicon"; Description: "Erstelle eine Verknüpfung auf dem &Desktop"; 
 Source: "StackMan.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
 
 [Icons]
-Name: "{group}\Webseiten\ViaThinkSoft"; Filename: "http://www.viathinksoft.de/"
+;Name: "{group}\Webseiten\ViaThinkSoft"; Filename: "https://www.viathinksoft.de/"
 Name: "{group}\Stack Manager"; Filename: "{app}\StackMan.exe"
 Name: "{group}\Stack Manager deinstallieren"; Filename: "{uninstallexe}"
 Name: "{userdesktop}\Stack Manager"; Filename: "{app}\StackMan.exe"; MinVersion: 4,4; Tasks: desktopicon

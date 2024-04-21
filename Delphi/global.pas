@@ -43,7 +43,7 @@ function IsRootNode(Node: TTreeNode): boolean;
 // function GetPersonalFolder(Default: string): string; overload;
 function GetPersonalFolder(): string; overload;
 function GetCatFromNode(Node: TTreeNode): string;
-Function GetHTML(AUrl: string): string;
+Function GetHTML(AUrl: string): RawByteString;
 procedure explode(delim: char; s: string; sl: TStringList);
 
 type
@@ -849,23 +849,24 @@ begin
     result := Node.Text;
 end;
 
-// http://www.delphipraxis.net/post43515.html
-Function GetHTML(AUrl: string): string;
+// https://www.delphipraxis.net/post43515.html , fixed , works for Delphi 12 Athens
+function GetHTML(AUrl: string): RawByteString;
 var
-  databuffer : array[0..4095] of char;
-  ResStr : string;
+  databuffer : array[0..4095] of ansichar; // SIC! ansichar!
+  ResStr : ansistring; // SIC! ansistring
   hSession, hfile: hInternet;
   dwindex,dwcodelen,dwread,dwNumber: cardinal;
   dwcode : array[1..20] of char;
   res    : pchar;
-  Str    : pchar;
+  Str    : pansichar; // SIC! pansichar
 begin
   ResStr:='';
-  if system.pos('http://',lowercase(AUrl))=0 then
+  if (system.pos('http://',lowercase(AUrl))=0) and
+     (system.pos('https://',lowercase(AUrl))=0) then
      AUrl:='http://'+AUrl;
 
   // Hinzugefügt
-  application.ProcessMessages;
+  if Assigned(Application) then Application.ProcessMessages;
 
   hSession:=InternetOpen('InetURL:/1.0',
                          INTERNET_OPEN_TYPE_PRECONFIG,
@@ -875,7 +876,7 @@ begin
   if assigned(hsession) then
   begin
     // Hinzugefügt
-    application.ProcessMessages;
+    if Assigned(Application) then application.ProcessMessages;
 
     hfile:=InternetOpenUrl(
            hsession,
@@ -888,7 +889,7 @@ begin
     dwCodeLen := 10;
 
     // Hinzugefügt
-    application.ProcessMessages;
+    if Assigned(Application) then application.ProcessMessages;
 
     HttpQueryInfo(hfile,
                   HTTP_QUERY_STATUS_CODE,
@@ -897,7 +898,7 @@ begin
                   dwIndex);
     res := pchar(@dwcode);
     dwNumber := sizeof(databuffer)-1;
-    if (res ='200') or (res ='302') then
+    if (res ='200') or (res = '302') then
     begin
       while (InternetReadfile(hfile,
                               @databuffer,
@@ -906,23 +907,23 @@ begin
       begin
 
         // Hinzugefügt
-        application.ProcessMessages;
+        if Assigned(Application) then application.ProcessMessages;
 
         if dwRead =0 then
           break;
         databuffer[dwread]:=#0;
-        Str := pchar(@databuffer);
+        Str := pansichar(@databuffer);
         resStr := resStr + Str;
       end;
     end
     else
-      ResStr := 'Status:'+res;
+      ResStr := 'Status:'+AnsiString(res);
     if assigned(hfile) then
       InternetCloseHandle(hfile);
   end;
 
   // Hinzugefügt
-  application.ProcessMessages;
+  if Assigned(Application) then application.ProcessMessages;
 
   InternetCloseHandle(hsession);
   Result := resStr;

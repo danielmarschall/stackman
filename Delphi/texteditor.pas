@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Menus, ShellAPI, ExtCtrls;
+  Dialogs, StdCtrls, Menus, ShellAPI, ExtCtrls, System.UITypes;
 
 type
   TMDITextEditor = class(TForm)

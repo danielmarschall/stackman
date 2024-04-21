@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Windows, Classes, Graphics, Forms, Controls, StdCtrls, ExtCtrls,
-  Dialogs, Menus, ImgList, ShellAPI, CheckLst;
+  Dialogs, Menus, ImgList, ShellAPI, CheckLst, System.UITypes;
 
 type
   TMDIAppender = class(TForm)

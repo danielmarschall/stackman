@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, Forms, Windows, ShellAPI, Controls,
-  ComCtrls, WinInet;
+  ComCtrls, WinInet, System.UITypes;
 
 type
   TAMode = (emUnknown, emFolder, emText, emAppender, emForeign);

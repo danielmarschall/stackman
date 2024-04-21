@@ -1,9 +1,9 @@
 object MDITextEditor: TMDITextEditor
   Left = 255
   Top = 367
-  Width = 347
-  Height = 180
   Caption = 'Text-Editor'
+  ClientHeight = 121
+  ClientWidth = 331
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,19 +12,17 @@ object MDITextEditor: TMDITextEditor
   Font.Style = []
   FormStyle = fsMDIChild
   Menu = MainMenu1
-  OldCreateOrder = False
   Position = poDefault
   Visible = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object Memo1: TMemo
     Left = 0
     Top = 0
-    Width = 339
-    Height = 134
+    Width = 331
+    Height = 121
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -35,6 +33,8 @@ object MDITextEditor: TMDITextEditor
     ScrollBars = ssVertical
     TabOrder = 0
     OnChange = Memo1Change
+    ExplicitWidth = 339
+    ExplicitHeight = 134
   end
   object MainMenu1: TMainMenu
     Images = MainForm.ImageList2

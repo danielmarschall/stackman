@@ -1,37 +1,39 @@
 object MDIAppender: TMDIAppender
   Left = 215
   Top = 137
-  Width = 361
-  Height = 199
+  ClientHeight = 140
+  ClientWidth = 345
   Color = clBtnFace
   ParentFont = True
   FormStyle = fsMDIChild
   Menu = MainMenu
-  OldCreateOrder = False
   Position = poDefault
   Visible = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnShow = FormShow
-  PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 15
   object VSplitter: TSplitter
     Left = 0
-    Top = 94
-    Width = 353
+    Top = 81
+    Width = 345
     Height = 2
     Cursor = crVSplit
     Align = alBottom
+    ExplicitTop = 94
+    ExplicitWidth = 353
   end
   object topPanel: TPanel
     Left = 0
     Top = 0
-    Width = 353
-    Height = 94
+    Width = 345
+    Height = 81
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 353
+    ExplicitHeight = 94
     object CheckListBox1: TCheckListBox
       Left = 0
       Top = 0
@@ -48,12 +50,14 @@ object MDIAppender: TMDIAppender
   end
   object bottomPanel: TPanel
     Left = 0
-    Top = 96
-    Width = 353
+    Top = 83
+    Width = 345
     Height = 57
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
+    ExplicitTop = 96
+    ExplicitWidth = 353
     object newLineEdt: TMemo
       Left = 0
       Top = 0

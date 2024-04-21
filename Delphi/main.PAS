@@ -5,7 +5,7 @@ interface
 uses
   Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
   StdCtrls, Dialogs, Buttons, Messages, ExtCtrls, ComCtrls, StdActns,
-  ActnList, ToolWin, ImgList, ShellAPI;
+  ActnList, ToolWin, ImgList, ShellAPI, System.ImageList, System.Actions;
 
 type
   TMainForm = class(TForm)
@@ -174,13 +174,13 @@ resourcestring
   lng_caption_information = 'Information';
   lng_update_new_version = 'Eine neue Programmversion (%s) ist vorhanden. Möchten Sie diese jetzt herunterladen?';
 const
-  url_comparison = 'http://www.viathinksoft.de/update/?id=%s&expect_version=%s';
-  url_version = 'http://www.viathinksoft.de/update/?id=%s';
-  url_download = 'http://www.viathinksoft.de/update/?id=@%s';
+  url_comparison = 'https://www.viathinksoft.de/update/?id=%s&expect_version=%s';
+  url_version = 'https://www.viathinksoft.de/update/?id=%s';
+  url_download = 'https://www.viathinksoft.de/update/?id=@%s';
   res_nothing = 'NO_UPDATES';
   res_updates = 'UPDATE_AVAILABLE';
 var
-  temp: string;
+  temp: RawByteString;
 begin
   temp := GetHTML(Format(url_comparison, [abbreviation, thisversion]));
 

@@ -45,8 +45,8 @@ Source: "StackMan.exe"; DestDir: "{app}"; Flags: ignoreversion signonce
 [Icons]
 ;Name: "{group}\Webseiten\ViaThinkSoft"; Filename: "https://www.viathinksoft.de/"
 Name: "{group}\Stack Manager"; Filename: "{app}\StackMan.exe"
-Name: "{group}\Stack Manager deinstallieren"; Filename: "{uninstallexe}"
-Name: "{userdesktop}\Stack Manager"; Filename: "{app}\StackMan.exe"; MinVersion: 4,4; Tasks: desktopicon
+;Name: "{group}\Stack Manager deinstallieren"; Filename: "{uninstallexe}"
+Name: "{autodesktop}\Stack Manager"; Filename: "{app}\StackMan.exe"; MinVersion: 4,4; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\StackMan.exe"; Description: "Stack Manager starten"; Flags: nowait postinstall skipifsilent
